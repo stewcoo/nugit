@@ -9,7 +9,7 @@ const program = new Command();
 
     program
         .name('Nugit')
-        .description('a simple version control system')
+        .description('A simple version control system')
         .version(VERSION, '-v, --version');
     
     // ECHO
@@ -25,10 +25,15 @@ const program = new Command();
 
     // HASH OBJECT
     program.command('hash')
-        .description('Obtain an id by hashing an <object>, store the object using the id, and log the id')
+        .description('Obtain an id by hashing an <object>, store the object using the id, and return the id')
         .argument('<object>', 'string value for object')
         .action((arg): void => console.log( Data.hashObject(arg) ));
     
+    // READ OBJECT
+    program.command('cat')
+        .description('Returns object file from <id>') // this will eventually take a variadic argument
+        .argument('<id>', 'hex id of object')
+        .action((arg): void => console.log( Data.cat(arg) ));
     program.parse();
 
 })();

@@ -1,6 +1,6 @@
 
 - [x] init command
-- [ ] cat command
+- [x] cat command
 - [ ] types of objects
 - [ ] write tree (to screen)
 - [ ] ignore

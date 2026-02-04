@@ -18,6 +18,11 @@ export function hashObject(data: string): string {
     // make sure object directory exists
     if (!fs.existsSync(objDir)) fs.mkdirSync(objDir);
 
-    fs.writeFileSync(`${objDir}/${objID}`, data, 'binary');
+    // todo implement binary encoding
+    fs.writeFileSync(`${objDir}/${objID}`, data, 'utf-8'); // change encoding
     return objID;
+}
+
+export function cat(id: string): string {
+    return fs.readFileSync(`${DIR}/objects/${id}`, 'utf-8'); // change encoding
 }
