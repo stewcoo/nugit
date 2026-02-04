@@ -1,0 +1,1 @@
+export const VERSION: string = 'nugit version 0.0.0';

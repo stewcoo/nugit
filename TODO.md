@@ -1,0 +1,17 @@
+
+- [x] init command
+- [ ] cat command
+- [ ] types of objects
+- [ ] write tree (to screen)
+- [ ] ignore
+- [ ] write tree objects
+- [ ] read tree
+- [ ] delete working directory before read tree
+- [ ] create commit!
+- [ ] head
+- [ ] link commit to head
+- [ ] log
+- [ ] checkout
+- [ ] tag
+- [ ] branch
+- [ ] create benchmark log file
