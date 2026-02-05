@@ -1,7 +1,6 @@
 import { exec } from "child_process";
 import esbuild from "esbuild";
 import process from "process";
-import { readFileSync } from "fs";
 
 const prod = process.argv[2] === "production";
 

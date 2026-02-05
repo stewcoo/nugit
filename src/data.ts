@@ -8,21 +8,36 @@ export function init() {
     return `empty nugit directory initialized in ${process.cwd()}/${DIR}`;
 }
 
-export function hashObject(data: string): string {
+export function hashObject(data: Buffer, type: string='blob'): string {
 
-    const objID: string = createHash('sha1').update(data).digest('hex'); // chaining still feels like black magic
     const objDir: string = `${DIR}/objects`;
-
+    
     // make sure nugit is initialized
     if (!fs.existsSync(DIR)) return 'WHOOPS! nugit directory not found...\n\tUse command: "nugit init"';
     // make sure object directory exists
     if (!fs.existsSync(objDir)) fs.mkdirSync(objDir);
-
-    // todo implement binary encoding
-    fs.writeFileSync(`${objDir}/${objID}`, data, 'utf-8'); // change encoding
+    
+    // append object type to data
+    let buff: Buffer = Buffer.concat([Buffer.from(`${type}\0`), data])
+    
+    const objID: string = createHash('sha1').update(buff).digest('hex'); // chaining still feels like black magic
+    fs.writeFileSync(`${objDir}/${objID}`, buff, 'binary');
+    
     return objID;
 }
 
-export function cat(id: string): string {
-    return fs.readFileSync(`${DIR}/objects/${id}`, 'utf-8'); // change encoding
+export function hashFile(filePath: string): string {
+    return hashObject( fs.readFileSync(filePath) );
+}
+
+export function cat(id: string, expected?: string): Buffer {
+
+    const obj: Buffer = fs.readFileSync(`${DIR}/objects/${id}`);
+    const type: string = obj.subarray(0, 4).toString();
+
+    if ( !(expected === undefined) && type !== expected) {
+        throw new TypeError(`Expected type: "${expected}", got type: "${type}"`);
+    }
+
+    return obj.subarray(5);
 }

@@ -1,7 +1,7 @@
 
 - [x] init command
 - [x] cat command
-- [ ] types of objects
+- [x] types of objects
 - [ ] write tree (to screen)
 - [ ] ignore
 - [ ] write tree objects
@@ -14,4 +14,5 @@
 - [ ] checkout
 - [ ] tag
 - [ ] branch
+- [ ] prune commands (get rid of test commands)
 - [ ] create benchmark log file
