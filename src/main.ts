@@ -33,7 +33,7 @@ const program = new Command();
     program.command('cat')
         .description('Returns object file from <id>')
         .argument('<id>', 'hex id of object')
-        .action((arg): void => console.log( Data.cat(arg).toString() ));
+        .action((arg): void => console.log( Data.catFile(arg) ));
     
     program.parse();
 

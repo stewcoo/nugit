@@ -3,17 +3,23 @@ import { createHash } from "crypto";
 
 const DIR = '.nugit';
 
+function noDir(): string | boolean {
+    // make sure nugit is initialized
+    if (!fs.existsSync(DIR)) return 'WHOOPS! nugit directory not found...\n\tUse command: "nugit init"';
+    return false;
+}
+
+
 export function init() {
     fs.mkdirSync(DIR);
     return `empty nugit directory initialized in ${process.cwd()}/${DIR}`;
 }
 
+
 export function hashObject(data: Buffer, type: string='blob'): string {
 
     const objDir: string = `${DIR}/objects`;
-    
-    // make sure nugit is initialized
-    if (!fs.existsSync(DIR)) return 'WHOOPS! nugit directory not found...\n\tUse command: "nugit init"';
+
     // make sure object directory exists
     if (!fs.existsSync(objDir)) fs.mkdirSync(objDir);
     
@@ -26,9 +32,14 @@ export function hashObject(data: Buffer, type: string='blob'): string {
     return objID;
 }
 
+
 export function hashFile(filePath: string): string {
+    
+    let e: string | boolean = noDir();
+    if (e) return e.toString();
     return hashObject( fs.readFileSync(filePath) );
 }
+
 
 export function cat(id: string, expected?: string): Buffer {
 
@@ -40,4 +51,11 @@ export function cat(id: string, expected?: string): Buffer {
     }
 
     return obj.subarray(5);
+}
+
+export function catFile(id: string): string {
+
+    let e = noDir();
+    if (e) return e.toString();
+    return cat(id).toString();
 }
