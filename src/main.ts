@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as Data from './data';
-import { VERSION } from './version';
+import * as Base from './base';
+import { Version } from './version';
 import { Command } from 'commander';
 const program = new Command();
 
@@ -10,7 +11,7 @@ const program = new Command();
     program
         .name('Nugit')
         .description('A simple version control system')
-        .version(VERSION, '-v, --version');
+        .version(Version, '-v, --version');
     
     // ECHO
     program.command('echo')
@@ -34,6 +35,11 @@ const program = new Command();
         .description('Returns object file from <id>')
         .argument('<id>', 'hex id of object')
         .action((arg): void => console.log( Data.catFile(arg) ));
+
+    // WRITE TREE
+    program.command('write-tree')
+        .description('Write current directory')
+        .action((): void => console.log( Base.writeTree().join('\n') ));
     
     program.parse();
 

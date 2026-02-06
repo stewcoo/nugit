@@ -53,6 +53,7 @@ export function cat(id: string, expected?: string): Buffer {
     return obj.subarray(5);
 }
 
+
 export function catFile(id: string): string {
 
     let e = noDir();
