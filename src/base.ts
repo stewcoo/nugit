@@ -1,24 +1,50 @@
-// import * as Data from './data';
+import * as Data from './data';
 import * as fs from "node:fs";
 
-export function writeTree(dir: string='.', result: string[]=[]): string[] {
+function isIgnored(path: string): boolean {
+    return path.split('/').some(s => s === '.nugit');
+}
+
+
+export function writeTree(dir: string='.') {
 
     const files: string[] = fs.readdirSync(dir);
-    let r = result;
+    // let r: string[] = result;
+    let entries: { name: string, id: string, type: string}[] = [];
 
     for (const item of files) {
-        let path = `${dir}/${item}`
+
+        let path: string = `${dir}/${item}`
+
+        if (isIgnored(path)) continue;
+
+        let id: string = '';
+        let type: string = '';
+
+        const stats = fs.statSync(path);
         //if file
-        if (fs.statSync(path).isFile()) {
-            r.push(path);
+        if (stats.isFile()) {
+            id = Data.hashFile(path);
+            type = 'blob';
         }
         // if dir
-        else if (fs.statSync(path).isDirectory()){
-            r = writeTree(path, r);
+        else if (stats.isDirectory()){
+            id = writeTree(path);
+            type = 'tree'
         }
+
+        entries.push({
+            name: item,
+            id: id,
+            type: type
+        });
     }
 
-    return r;
+    // CREATE TREE OBJECT
+    let tree: string = entries.map( (entry): string => `${entry.name} ${entry.id} ${entry.type}` )
+        .join('\n');
+
+    return Data.hashObject(Buffer.from(tree), 'tree');
 }
 
 // SUPER AWESOME FUNCTION I WROTE THAT UNFORTUNATELY ISN'T VERY USEFUL
@@ -36,13 +62,11 @@ export function writeTree(dir: string='.', result: string[]=[]): string[] {
 
 //         //if file
 //         if (fs.statSync(`${dir}/${item}`).isFile()) {
-//             // console.log(spacer + `${item}`);
-//             r += spacer + `${item}\n`;
+//             r += spacer + ` ${item}\n`;
 //         }
 //         // if dir
 //         else if (fs.statSync(`${dir}/${item}`).isDirectory()){
-//             // console.log(spacer + `/${item}`);
-//             r += spacer + `/${item}\n`;
+//             r += spacer + ` ${item}/\n`;
 //             r = printTree(`${dir}/${item}`, ++level, r);
 //             level--;
 //         }

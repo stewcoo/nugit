@@ -2,9 +2,9 @@
 - [x] init command
 - [x] cat command
 - [x] types of objects
-- [ ] write tree (to screen)
-- [ ] ignore
-- [ ] write tree objects
+- [x] write tree (to screen)
+- [x] ignore
+- [x] write tree objects
 - [ ] read tree
 - [ ] delete working directory before read tree
 - [ ] create commit!

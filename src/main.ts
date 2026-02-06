@@ -39,7 +39,12 @@ const program = new Command();
     // WRITE TREE
     program.command('write-tree')
         .description('Write current directory')
-        .action((): void => console.log( Base.writeTree().join('\n') ));
+        .action((): void => console.log( Base.writeTree() ));
+    
+    // PRINT TREE
+    // program.command('print-tree')
+    //     .description('Write current directory')
+    //     .action((): void => console.log( Base.printTree() ));
     
     program.parse();
 
