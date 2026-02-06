@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 
 const DIR = '.nugit';
 
-function noDir(): string | boolean {
+export function noDir(): string | boolean {
     // make sure nugit is initialized
     if (!fs.existsSync(DIR)) return 'WHOOPS! nugit directory not found...\n\tUse command: "nugit init"';
     return false;
@@ -15,6 +15,17 @@ export function init() {
     return `empty nugit directory initialized in ${process.cwd()}/${DIR}`;
 }
 
+
+export function setHead(id: string) {
+    fs.writeFileSync(`${DIR}/HEAD`, Buffer.from(id));
+}
+
+export function getHead(): Buffer | undefined {
+    const path = `${DIR}/HEAD`;
+    if (fs.existsSync(path)) return fs.readFileSync(path);
+
+    return undefined;
+}
 
 export function hashObject(data: Buffer, type: string='blob'): string {
 

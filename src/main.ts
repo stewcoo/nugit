@@ -38,7 +38,7 @@ const program = new Command();
 
     // WRITE TREE
     program.command('write-tree')
-        .description('Write current directory')
+        .description('Write current directory and return its id')
         .action((): void => console.log( Base.writeTree() ));
 
     // READ TREE
@@ -46,6 +46,12 @@ const program = new Command();
         .description('Read <tree> to current directory')
         .argument('<tree>', 'id string for tree')
         .action((arg): void => console.log( Base.readTree(arg) ));
+
+    // COMMIT
+    program.command('commit')
+        .description('commit changes with <message> and return its id')
+        .argument('<message>', 'required message to include with commit')
+        .action((arg): void => console.log( Base.commit(arg) ));
     
     // PRINT TREE
     // program.command('print-tree')

@@ -7,9 +7,9 @@
 - [x] write tree objects
 - [x] read tree
 - [x] delete working directory before read tree
-- [ ] create commit!
-- [ ] head
-- [ ] link commit to head
+- [x] create commit!
+- [x] head
+- [x] link commit to head
 - [ ] log commit history
 - [ ] checkout
 - [ ] tag

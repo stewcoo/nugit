@@ -1,6 +1,24 @@
 import * as Data from './data';
 import * as fs from "node:fs";
 
+export function commit(message: string): string {
+    
+    let e: string | boolean = Data.noDir();
+    if (e) return e.toString();
+
+    let commit: string = `tree ${writeTree()}\n`;
+
+    const parent: Buffer | undefined = Data.getHead();
+    if (parent) commit += `parent ${parent}\n`;
+    
+    commit += `\n${message}\n`;
+
+    const id: string = Data.hashObject(Buffer.from(commit), 'comm');
+    Data.setHead(id);
+
+    return id;
+}
+
 function isIgnored(path: string): boolean {
     return path.split('/').some(s => s === '.nugit');
 }
@@ -19,7 +37,7 @@ function clearDir(dir: string) {
         if (stats.isFile()) fs.rmSync(path);
         else if (stats.isDirectory()) {
             clearDir(path);
-            // fs.rmdirSync(path);
+            fs.rmdirSync(path);
         }
     }
 }
