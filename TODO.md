@@ -5,12 +5,12 @@
 - [x] write tree (to screen)
 - [x] ignore
 - [x] write tree objects
-- [ ] read tree
-- [ ] delete working directory before read tree
+- [x] read tree
+- [x] delete working directory before read tree
 - [ ] create commit!
 - [ ] head
 - [ ] link commit to head
-- [ ] log
+- [ ] log commit history
 - [ ] checkout
 - [ ] tag
 - [ ] branch

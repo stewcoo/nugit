@@ -5,6 +5,65 @@ function isIgnored(path: string): boolean {
     return path.split('/').some(s => s === '.nugit');
 }
 
+function clearDir(dir: string) {
+    
+    const files: string[] = fs.readdirSync(dir);
+
+    for (const item of files) {
+
+        const path: string = `${dir}/${item}`
+        const stats = fs.statSync(path);
+
+        if (isIgnored(path)) continue;
+
+        if (stats.isFile()) fs.rmSync(path);
+        else if (stats.isDirectory()) {
+            clearDir(path);
+            // fs.rmdirSync(path);
+        }
+    }
+}
+
+
+function* genTreeEntries(id: string) {
+
+    const tree = Data.cat(id, 'tree').toString();
+
+    for (const line of tree.split('\n')) {
+        let entry: string[] = line.split(' ');
+        yield {
+            name: entry[0],
+            id: entry[1],
+            type: entry[2]
+        };
+    }
+}
+
+
+export function getTree(id: string, dir: string) {
+
+    for (const entry of genTreeEntries(id)) {
+        const path = `${dir}/${entry.name}`;
+        // if file
+        if (entry.type === 'blob') fs.writeFileSync(path, Data.cat(entry.id));
+        // if dir
+        if (entry.type === 'tree') {
+            if (!fs.existsSync(path)) {
+                fs.mkdirSync(path);
+            }
+            getTree(entry.id, path);
+        }
+    }
+
+    return 'extracted tree in current directory';
+}
+
+
+export function readTree(id: string, dir: string='.') {
+    clearDir(dir);
+    return getTree(id, dir);
+}
+
 
 export function writeTree(dir: string='.') {
 
@@ -14,7 +73,7 @@ export function writeTree(dir: string='.') {
 
     for (const item of files) {
 
-        let path: string = `${dir}/${item}`
+        const path: string = `${dir}/${item}`
 
         if (isIgnored(path)) continue;
 

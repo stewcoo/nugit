@@ -40,6 +40,12 @@ const program = new Command();
     program.command('write-tree')
         .description('Write current directory')
         .action((): void => console.log( Base.writeTree() ));
+
+    // READ TREE
+    program.command('read-tree')
+        .description('Read <tree> to current directory')
+        .argument('<tree>', 'id string for tree')
+        .action((arg): void => console.log( Base.readTree(arg) ));
     
     // PRINT TREE
     // program.command('print-tree')
