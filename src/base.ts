@@ -1,6 +1,47 @@
 import * as Data from './data';
 import * as fs from "node:fs";
 
+type Commit = {tree: string, parent: string | undefined, message: string};
+
+export function getAddress(address: string): string {
+    const adr: Buffer | undefined = Data.getRef(address);
+    return adr ? adr.toString() : address;
+}
+
+
+export function createTag(name: string, commit: string) {
+    Data.setRef(`ref/tag/${name}`, getAddress(commit));
+    return `Created tag: ${name} linked to commit: ${commit}`;
+}
+
+
+export function getCommit(address: string): Commit | undefined {
+
+    const commitString: string = Data.cat(address, 'comm').toString();
+    const commit: Commit = {
+        tree: '',
+        parent: undefined,
+        message: ''
+    };
+    
+    const lines = commitString.split('\n');
+    let end = 0;
+    for (const line of lines) {
+        end++;
+        if (line === '\n') break;
+
+        const [key, value] = line.trim().split(' ');
+
+        if (key === 'tree') commit.tree = value;
+        else if (key === 'parent') commit.parent = value;
+
+    }
+
+    commit.message = lines[end - 1];
+    return commit;
+}
+
+
 export function commit(message: string): string {
     
     let e: string | boolean = Data.noDir();
@@ -8,20 +49,34 @@ export function commit(message: string): string {
 
     let commit: string = `tree ${writeTree()}\n`;
 
-    const parent: Buffer | undefined = Data.getHead();
+    const parent: Buffer | undefined = Data.getRef('HEAD');
     if (parent) commit += `parent ${parent}\n`;
     
-    commit += `\n${message}\n`;
+    commit += `\n${message}`;
 
     const id: string = Data.hashObject(Buffer.from(commit), 'comm');
-    Data.setHead(id);
+    Data.setRef('HEAD', id);
 
     return id;
 }
 
+export function checkout(address: string): string {
+
+    // console.log(address);
+
+    const commit: Commit | undefined = getCommit(address);
+
+    if (commit) Data.setRef('HEAD', address);
+    else return 'no commit at address: ' + address;
+
+    return readTree(commit.tree);
+}
+
+
 function isIgnored(path: string): boolean {
     return path.split('/').some(s => s === '.nugit');
 }
+
 
 function clearDir(dir: string) {
     

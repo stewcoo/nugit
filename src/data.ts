@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import { createHash } from "crypto";
+import * as path from "path";
 
 const DIR = '.nugit';
 
@@ -16,16 +17,27 @@ export function init() {
 }
 
 
-export function setHead(id: string) {
-    fs.writeFileSync(`${DIR}/HEAD`, Buffer.from(id));
+export function setRef(ref: string, id: string) {
+
+    const subDir: string = path.dirname(ref);
+    if (!fs.existsSync(subDir)) fs.mkdirSync(`${DIR}/${subDir}`, {recursive: true});
+
+    fs.writeFileSync(`${DIR}/${ref}`, Buffer.from(id));
 }
 
-export function getHead(): Buffer | undefined {
-    const path = `${DIR}/HEAD`;
-    if (fs.existsSync(path)) return fs.readFileSync(path);
 
-    return undefined;
+export function getRef(ref: string): Buffer | undefined {
+
+    if (fs.existsSync(`${DIR}/${ref}`)) {
+        return fs.readFileSync(`${DIR}/${ref}`);
+    }
+    else if (fs.existsSync(`${DIR}/ref/tag/${ref}`)) {
+        return fs.readFileSync(`${DIR}/ref/tag/${ref}`);
+    } else {
+        throw Error('symbolic reference not found: ' + ref);
+    }
 }
+
 
 export function hashObject(data: Buffer, type: string='blob'): string {
 

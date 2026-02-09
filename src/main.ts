@@ -34,7 +34,7 @@ const program = new Command();
     program.command('cat')
         .description('Returns object file from <id>')
         .argument('<id>', 'hex id of object')
-        .action((arg): void => console.log( Data.catFile(arg) ));
+        .action((arg): void => console.log( Data.catFile(Base.getAddress(arg)) ));
 
     // WRITE TREE
     program.command('write-tree')
@@ -52,6 +52,21 @@ const program = new Command();
         .description('commit changes with <message> and return its id')
         .argument('<message>', 'required message to include with commit')
         .action((arg): void => console.log( Base.commit(arg) ));
+
+    // Checkout
+    program.command('checkout')
+        .description('switch branches or retore working directory')
+        .argument('<adress>', 'address of tree')
+        .action((arg): void => console.log( Base.checkout(Base.getAddress(arg)) ));
+
+    // TAGS
+    program.command('tag')
+        .description('link <name> with [commit]')
+        .argument('<name>', 'name for symbolic reference')
+        .argument('[commit]'
+            , 'either the id of a commit or a symbolic link to one, defaults to current commit'
+            , Data.getRef('HEAD')?.toString())
+        .action((name, commit): void => console.log( Base.createTag(name, commit) ));
     
     // PRINT TREE
     // program.command('print-tree')

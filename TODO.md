@@ -10,9 +10,8 @@
 - [x] create commit!
 - [x] head
 - [x] link commit to head
-- [ ] log commit history
-- [ ] checkout
-- [ ] tag
+- [x] checkout
+- [x] tag
 - [ ] branch
 - [ ] prune commands (get rid of test commands)
 - [ ] create benchmark log file
