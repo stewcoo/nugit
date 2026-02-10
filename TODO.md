@@ -12,6 +12,6 @@
 - [x] link commit to head
 - [x] checkout
 - [x] tag
-- [ ] branch
+- [x] branch
 - [ ] prune commands (get rid of test commands)
 - [ ] create benchmark log file
