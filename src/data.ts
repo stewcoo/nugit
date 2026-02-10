@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import { createHash } from "crypto";
 import * as path from "path";
+import { RefValue } from "./base"
 
 const DIR = '.nugit';
 
@@ -17,25 +18,47 @@ export function init() {
 }
 
 
-export function setRef(ref: string, id: string) {
+export function updateRef(ref: string, address: RefValue, deRef: boolean=true) {
 
+    ref = getInteral(ref, deRef)[0]; 
+ 
+    if (!address.value) throw Error('whoops');
+
+    let value = '';
+    if (address.symbolic) value = `ref: ${address.value}`;
+    else value = address.value;
+    
     const subDir: string = path.dirname(ref);
+
+
     if (!fs.existsSync(subDir)) fs.mkdirSync(`${DIR}/${subDir}`, {recursive: true});
 
-    fs.writeFileSync(`${DIR}/${ref}`, Buffer.from(id));
+    fs.writeFileSync(`${DIR}/${ref}`, Buffer.from(value));
 }
 
 
-export function getRef(ref: string): Buffer | undefined {
+export function getRef(ref: string, deRef: boolean=true): RefValue {
+    return getInteral(ref, deRef)[1];
+}
 
-    if (fs.existsSync(`${DIR}/${ref}`)) {
-        return fs.readFileSync(`${DIR}/${ref}`);
+
+function getInteral(ref: string, deRef: boolean): [string, RefValue] {
+    let value: string = '';
+    const refPath: string = `${DIR}/${ref}`;
+
+    
+    if (fs.existsSync(refPath)) value = fs.readFileSync(refPath).toString();
+
+    if (value.startsWith('ref:')) {
+        value = value.split(':')[1].trim()
+        if (deRef) {
+            return getInteral(value, true);}
     }
-    else if (fs.existsSync(`${DIR}/ref/tag/${ref}`)) {
-        return fs.readFileSync(`${DIR}/ref/tag/${ref}`);
-    } else {
-        throw Error('symbolic reference not found: ' + ref);
-    }
+
+    return [ref, {
+        symbolic: false,
+        value: value
+    }];
 }
 
 

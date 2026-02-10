@@ -2,18 +2,41 @@ import * as Data from './data';
 import * as fs from "node:fs";
 
 type Commit = {tree: string, parent: string | undefined, message: string};
+export type RefValue = {symbolic: boolean, value: string};
 
 export function getAddress(address: string): string {
-    const adr: Buffer | undefined = Data.getRef(address);
-    return adr ? adr.toString() : address;
+
+    const refFolders = [
+        `${address}`,
+        `ref/heads/${address}`,
+        `ref/tags/${address}`
+    ];
+
+    for (const ref of refFolders) {
+        const address = Data.getRef(ref);
+        if (address.value) return address.value;
+    }
+    
+    return address;
 }
 
 
 export function createTag(name: string, commit: string) {
-    Data.setRef(`ref/tag/${name}`, getAddress(commit));
+    Data.updateRef( `ref/tags/${name}`, {symbolic: false, value: getAddress(commit)} );
     return `Created tag: ${name} linked to commit: ${commit}`;
 }
 
+
+export function createBranch(name: string) {
+    const commit: string = Data.getRef('HEAD').value;
+
+    Data.updateRef( `ref/heads/${name}`, {symbolic: false, value: commit} );
+    return `Created branch named '${name}'`;
+}
+
+function isBranch(name: string) {
+    return Boolean(Data.getRef(`ref/heads/${name}`).value);
+}
 
 export function getCommit(address: string): Commit | undefined {
 
@@ -49,24 +72,28 @@ export function commit(message: string): string {
 
     let commit: string = `tree ${writeTree()}\n`;
 
-    const parent: Buffer | undefined = Data.getRef('HEAD');
-    if (parent) commit += `parent ${parent}\n`;
+    const parent: RefValue | undefined = Data.getRef('HEAD');
+    if (parent) commit += `parent ${parent.value}\n`;
     
     commit += `\n${message}`;
 
     const id: string = Data.hashObject(Buffer.from(commit), 'comm');
-    Data.setRef('HEAD', id);
+    Data.updateRef('HEAD', {symbolic: false, value: id});
 
     return id;
 }
 
 export function checkout(address: string): string {
 
-    // console.log(address);
+    const id = getAddress(address);
+    const commit: Commit | undefined = getCommit(id);
 
-    const commit: Commit | undefined = getCommit(address);
+    let head: RefValue;
 
-    if (commit) Data.setRef('HEAD', address);
+    if (isBranch(address)) head = {symbolic: true, value: `ref/heads/${address}`};
+    else head = {symbolic: false, value: id};
+
+    if (commit) Data.updateRef('HEAD', head, false);
     else return 'no commit at address: ' + address;
 
     return readTree(commit.tree);
@@ -128,7 +155,7 @@ export function getTree(id: string, dir: string) {
         }
     }
 
-    return 'extracted tree in current directory';
+    return 'extracted tree into current working directory';
 }
 
 

@@ -3,6 +3,7 @@ import * as Data from './data';
 import * as Base from './base';
 import { Version } from './version';
 import { Command } from 'commander';
+import { create } from 'node:domain';
 const program = new Command();
 
 
@@ -57,22 +58,29 @@ const program = new Command();
     program.command('checkout')
         .description('switch branches or retore working directory')
         .argument('<adress>', 'address of tree')
-        .action((arg): void => console.log( Base.checkout(Base.getAddress(arg)) ));
+        .action((arg): void => console.log( Base.checkout(arg) ));
 
     // TAGS
     program.command('tag')
         .description('link <name> with [commit]')
         .argument('<name>', 'name for symbolic reference')
         .argument('[commit]'
-            , 'either the id of a commit or a symbolic link to one, defaults to current commit'
-            , Data.getRef('HEAD')?.toString())
-        .action((name, commit): void => console.log( Base.createTag(name, commit) ));
+            ,'either the id of a commit or a symbolic link to one, defaults to current commit'
+            , Data.getRef('HEAD').value)
+        .action((name, commit): void => {
+            console.log( Base.createTag(name, commit) )
+        });
+
+    program.command('branch')
+            .description('create branch')
+            .argument('<name>', 'name of branch')
+            .action((arg): void => console.log( Base.createBranch(arg) ));
     
     // PRINT TREE
     // program.command('print-tree')
     //     .description('Write current directory')
     //     .action((): void => console.log( Base.printTree() ));
-    
+
     program.parse();
 
 })();
